@@ -16,9 +16,14 @@ export function ImageWithFallback(props: React.ImgHTMLAttributes<HTMLImageElemen
 
   const { src, alt, style, className, ...rest } = props
 
-  let finalSrc = src || DEFAULT_FALLBACK_IMG
-  if (typeof finalSrc === 'string' && finalSrc.startsWith('http://localhost:8000')) {
-    finalSrc = finalSrc.replace('http://localhost:8000', '')
+  const backendHost = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
+  let finalSrc = src || DEFAULT_FALLBACK_IMG;
+  if (typeof finalSrc === 'string') {
+    if (backendHost && finalSrc.startsWith('/static/')) {
+      finalSrc = `${backendHost}${finalSrc}`;
+    } else if (finalSrc.startsWith('http://localhost:8000') && !backendHost) {
+      finalSrc = finalSrc.replace('http://localhost:8000', '');
+    }
   }
 
   return didError ? (
